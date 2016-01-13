@@ -965,7 +965,7 @@ def from_playlist():
     return False
 
 def reset_base_url():
-    xml_path = os.path.join(kodi.get_path(), 'resources', 'settings.xml')
+    xml_path = SETTINGS_PATH
     tree = ET.parse(xml_path)
     for category in tree.getroot().findall('category'):
         if category.get('label').startswith('Scrapers '):

@@ -1,12 +1,17 @@
 import re
 import os
+import errno
 import datetime
 import time
+import xbmc
+import shutil
 from salts_lib import kodi
 from salts_lib import log_utils
 from salts_lib.constants import VIDEO_TYPES
 from salts_lib.constants import FORCE_NO_MATCH
 from . import scraper  # just to avoid editor warning
+
+SETTINGS_PATH = xbmc.translatePath(os.path.join(kodi.get_profile(), 'resources', 'settings.xml'))
 
 __all__ = ['scraper', 'local_scraper', 'pw_scraper', 'uflix_scraper', 'watchseries_scraper', 'movie25_scraper', 'merdb_scraper', '2movies_scraper', 'icefilms_scraper',
            'movieshd_scraper', 'viooz_scraper', 'filmstreaming_scraper', 'myvideolinks_scraper', 'filmikz_scraper', 'clickplay_scraper', 'nitertv_scraper',
@@ -57,7 +62,20 @@ def update_xml(xml, new_settings, cat_count):
     return xml
 
 def update_settings():
-    full_path = os.path.join(kodi.get_path(), 'resources', 'settings.xml')
+    full_path = SETTINGS_PATH
+    if not os.path.exists(full_path):
+        try:
+            os.makedirs(os.path.dirname(full_path))
+        except OSError as exc:
+            if exc.errno == errno.EEXIST and os.path.isdir(full_path):
+                pass
+            else:
+                raise
+        dist_path = os.path.join(kodi.get_path(), 'resources', 'settings.xml')
+        try:
+            shutil.copyfile(dist_path,full_path)
+        except:
+            raise
     try:
         with open(full_path, 'r') as f:
             xml = f.read()
